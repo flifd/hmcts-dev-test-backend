@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.dev.utils.Constants;
 import uk.gov.hmcts.reform.dev.utils.Utils;
 
 import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +31,7 @@ public class TaskServiceImpl implements TaskService {
         List<TaskResponse> taskDtos = new ArrayList<>();
 
         Iterable<Task> dbResponse = taskRepository.findAll();
-        dbResponse.forEach(task -> {
-            taskDtos.add(taskMapper.toDto(task));
-        });
+        dbResponse.forEach(task -> taskDtos.add(taskMapper.toDto(task)));
 
         return taskDtos;
     }
@@ -65,10 +62,10 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskResponse updateTask(int taskId, String status) {
-        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
+        Task dbResponse = taskRepository.updateTask(taskId, Constants.Status.valueOf(status))
+            .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
 
-
-        return new TaskResponse();
+        return taskMapper.toDto(dbResponse);
     }
 
     @Override

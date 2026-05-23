@@ -10,11 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.dev.dtos.TaskRequest;
 import uk.gov.hmcts.reform.dev.dtos.TaskResponse;
 import uk.gov.hmcts.reform.dev.dtos.UpdateStatusRequest;
 import uk.gov.hmcts.reform.dev.models.Task;
+import uk.gov.hmcts.reform.dev.models.TaskMapper;
 import uk.gov.hmcts.reform.dev.repository.TaskRepository;
 import uk.gov.hmcts.reform.dev.utils.Constants;
 
@@ -23,7 +22,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +29,9 @@ public class UpdateTaskUnitTest {
     private Validator validator;
     @Mock
     TaskRepository taskRepository;
+
+    @Mock
+    TaskMapper taskMapper;
 
     @InjectMocks
     TaskServiceImpl taskService;
@@ -51,9 +52,20 @@ public class UpdateTaskUnitTest {
         LocalDateTime.parse("2026-05-22T00:00:00")
     );
 
+    TaskResponse updatedTaskDto = TaskResponse.builder()
+        .id(0)
+        .title("Review blocked case")
+        .description("Investigate the cause")
+        .status(Constants.Status.IN_PROGRESS)
+        .dueTimestamp(LocalDateTime.parse("2026-05-25T00:00:00"))
+        .createdTimestamp(LocalDateTime.parse("2026-05-22T00:00:00"))
+        .updatedTimestamp(LocalDateTime.parse("2026-05-22T00:00:00"))
+        .build();
+
     @Test
     void testUpdateSuccess() {
         when(taskRepository.updateTask(0, Constants.Status.IN_PROGRESS)).thenReturn(Optional.ofNullable(updatedTask));
+        when(taskMapper.toDto(updatedTask)).thenReturn(updatedTaskDto);
 
         TaskResponse response = taskService.updateTask(0, "IN_PROGRESS");
 
