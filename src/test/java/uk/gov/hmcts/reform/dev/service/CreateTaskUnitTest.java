@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dev.dtos.TaskRequest;
 import uk.gov.hmcts.reform.dev.dtos.TaskResponse;
 import uk.gov.hmcts.reform.dev.models.Task;
+import uk.gov.hmcts.reform.dev.models.TaskMapper;
 import uk.gov.hmcts.reform.dev.repository.TaskRepository;
 import uk.gov.hmcts.reform.dev.utils.Constants;
 
@@ -29,6 +30,9 @@ public class CreateTaskUnitTest {
     private Validator validator;
     @Mock
     TaskRepository taskRepository;
+
+    @Mock
+    TaskMapper taskMapper;
 
     @InjectMocks
     TaskServiceImpl taskService;
@@ -52,7 +56,6 @@ public class CreateTaskUnitTest {
             LocalDateTime.parse("2026-05-22T00:00:00"),
             LocalDateTime.parse("2026-05-22T00:00:00")
         );
-        when(taskRepository.save(any(Task.class))).thenReturn(task);
 
         TaskRequest taskReq = TaskRequest.builder()
             .title("Review blocked case")
@@ -71,6 +74,10 @@ public class CreateTaskUnitTest {
             .updatedTimestamp(LocalDateTime.parse("2026-05-22T00:00:00"))
             .build();
 
+        when(taskRepository.save(task)).thenReturn(task);
+        when(taskMapper.fromDto(taskReq)).thenReturn(task);
+        when(taskMapper.toDto(task)).thenReturn(expectedTaskRes);
+
         TaskResponse taskRes = taskService.createTask(taskReq);
         assertThat(taskRes).isEqualTo(expectedTaskRes);
     }
@@ -86,7 +93,6 @@ public class CreateTaskUnitTest {
             LocalDateTime.parse("2026-05-22T00:00:00"),
             LocalDateTime.parse("2026-05-22T00:00:00")
         );
-        when(taskRepository.save(any(Task.class))).thenReturn(task);
 
         TaskResponse expectedTaskRes = TaskResponse.builder()
             .id(0)
@@ -103,6 +109,10 @@ public class CreateTaskUnitTest {
             .status("PENDING")
             .dueTimeStamp(LocalDateTime.now().plusDays(1))
             .build();
+
+        when(taskRepository.save(task)).thenReturn(task);
+        when(taskMapper.fromDto(taskReq)).thenReturn(task);
+        when(taskMapper.toDto(task)).thenReturn(expectedTaskRes);
 
         TaskResponse taskRes = taskService.createTask(taskReq);
         assertThat(taskRes).isEqualTo(expectedTaskRes);

@@ -167,6 +167,9 @@ dependencies {
   implementation group: 'io.rest-assured', name: 'rest-assured'
   implementation group: 'org.projectlombok', name: 'lombok'
   implementation 'org.postgresql:postgresql'
+  implementation 'org.mapstruct:mapstruct:1.6.3'
+  annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
   annotationProcessor 'org.projectlombok:lombok'
 
   testImplementation(platform('org.junit:junit-bom:6.1.0'))

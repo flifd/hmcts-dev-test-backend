@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.dev.dtos.TaskRequest;
 import uk.gov.hmcts.reform.dev.dtos.TaskResponse;
 import uk.gov.hmcts.reform.dev.exceptions.TaskNotFoundException;
 import uk.gov.hmcts.reform.dev.models.Task;
+import uk.gov.hmcts.reform.dev.models.TaskMapper;
 import uk.gov.hmcts.reform.dev.repository.TaskRepository;
 import uk.gov.hmcts.reform.dev.utils.Constants;
 import uk.gov.hmcts.reform.dev.utils.Utils;
@@ -23,21 +24,16 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private Utils utils;
 
+    @Autowired
+    private TaskMapper taskMapper;
+
     @Override
     public List<TaskResponse> getAllTasks() {
         List<TaskResponse> taskDtos = new ArrayList<>();
 
-        Iterable<Task> tasks = taskRepository.findAll();
-        tasks.forEach(task -> {
-            taskDtos.add(TaskResponse.builder()
-                             .id(task.getId())
-                             .title(task.getTitle())
-                             .description(task.getDescription())
-                             .status(Constants.Status.valueOf(task.getStatus().name()))
-                             .dueTimestamp(task.getDueTimestamp())
-                             .createdTimestamp(task.getCreatedTimestamp())
-                             .updatedTimestamp(task.getUpdatedTimestamp())
-                             .build());
+        Iterable<Task> dbResponse = taskRepository.findAll();
+        dbResponse.forEach(task -> {
+            taskDtos.add(taskMapper.toDto(task));
         });
 
         return taskDtos;
@@ -55,41 +51,16 @@ public class TaskServiceImpl implements TaskService {
             return null;
         }
 
-        return TaskResponse.builder()
-            .id(dbResponse.getId())
-            .title(dbResponse.getTitle())
-            .description(dbResponse.getDescription())
-            .status(Constants.Status.valueOf(dbResponse.getStatus().name()))
-            .dueTimestamp(dbResponse.getDueTimestamp())
-            .createdTimestamp(dbResponse.getCreatedTimestamp())
-            .updatedTimestamp(dbResponse.getUpdatedTimestamp())
-            .build();
+        return taskMapper.toDto(dbResponse);
     }
 
     @Override
     public TaskResponse createTask(TaskRequest taskDto) {
-        Task task = new Task(
-            null,
-            taskDto.getTitle(),
-            taskDto.getDescription(),
-            Constants.Status.valueOf(taskDto.getStatus()),
-            taskDto.getDueTimeStamp(),
-            LocalDateTime.now(),
-            LocalDateTime.now()
-        );
+        Task task = taskMapper.fromDto(taskDto);
 
         Task dbResponse = taskRepository.save(task);
 
-
-        return TaskResponse.builder()
-            .id(dbResponse.getId())
-            .title(dbResponse.getTitle())
-            .description(dbResponse.getDescription())
-            .status(Constants.Status.valueOf(dbResponse.getStatus().name()))
-            .dueTimestamp(dbResponse.getDueTimestamp())
-            .createdTimestamp(dbResponse.getCreatedTimestamp())
-            .updatedTimestamp(dbResponse.getUpdatedTimestamp())
-            .build();
+        return taskMapper.toDto(dbResponse);
     }
 
     @Override

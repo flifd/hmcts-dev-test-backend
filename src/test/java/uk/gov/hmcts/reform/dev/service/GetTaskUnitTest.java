@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dev.dtos.TaskResponse;
 import uk.gov.hmcts.reform.dev.models.Task;
+import uk.gov.hmcts.reform.dev.models.TaskMapper;
 import uk.gov.hmcts.reform.dev.repository.TaskRepository;
 import uk.gov.hmcts.reform.dev.utils.Constants;
 import uk.gov.hmcts.reform.dev.utils.Utils;
@@ -25,6 +26,9 @@ import static org.mockito.Mockito.when;
 public class GetTaskUnitTest {
     @Mock
     TaskRepository taskRepository;
+
+    @Mock
+    TaskMapper taskMapper;
 
     @Mock
     Utils utils;
@@ -55,6 +59,7 @@ public class GetTaskUnitTest {
     @Test
     void testGetTask() {
         when(utils.validateTaskId(0)).thenReturn(true);
+        when(taskMapper.toDto(task)).thenReturn(expectedTaskRes);
         when(taskRepository.findById(0)).thenReturn(java.util.Optional.of(task));
 
         TaskResponse response = taskService.getTaskById(0);
@@ -74,12 +79,16 @@ public class GetTaskUnitTest {
     void testGetAllTasks() {
         Task task2 = task;
         task2.setId(1);
+        TaskResponse expectedTaskRes2 = expectedTaskRes;
+        expectedTaskRes2.setId(1);
 
         List<Task> taskList = List.of(
             task,
             task2
         );
         when(taskRepository.findAll()).thenReturn(taskList);
+        when(taskMapper.toDto(task)).thenReturn(expectedTaskRes);
+        when(taskMapper.toDto(task2)).thenReturn(expectedTaskRes2);
 
         List<TaskResponse> response = taskService.getAllTasks();
         assertThat(response.size()).isEqualTo(taskList.size());
