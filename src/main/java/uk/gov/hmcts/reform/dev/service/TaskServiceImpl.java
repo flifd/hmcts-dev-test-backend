@@ -94,6 +94,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskResponse updateTask(int taskId, String status) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
+
+
         return new TaskResponse();
     }
 
