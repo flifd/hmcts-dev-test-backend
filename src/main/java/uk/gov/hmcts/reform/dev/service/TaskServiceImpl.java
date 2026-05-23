@@ -78,5 +78,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteTask(int taskId) {
+        if (!utils.validateTaskId(taskId)) {
+            throw new InvalidParameterException("Invalid task ID");
+        }
+
+        // Check if the task exists first
+        taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
+        taskRepository.deleteById(taskId);
     }
 }
