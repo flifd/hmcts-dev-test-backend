@@ -67,8 +67,29 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponse createTask(TaskRequest task) {
-        return new TaskResponse();
+    public TaskResponse createTask(TaskRequest taskDto) {
+        Task task = new Task(
+            null,
+            taskDto.getTitle(),
+            taskDto.getDescription(),
+            Constants.Status.valueOf(taskDto.getStatus()),
+            taskDto.getDueTimeStamp(),
+            LocalDateTime.now(),
+            LocalDateTime.now()
+        );
+
+        Task dbResponse = taskRepository.save(task);
+
+
+        return TaskResponse.builder()
+            .id(dbResponse.getId())
+            .title(dbResponse.getTitle())
+            .description(dbResponse.getDescription())
+            .status(Constants.Status.valueOf(dbResponse.getStatus().name()))
+            .dueTimestamp(dbResponse.getDueTimestamp())
+            .createdTimestamp(dbResponse.getCreatedTimestamp())
+            .updatedTimestamp(dbResponse.getUpdatedTimestamp())
+            .build();
     }
 
     @Override
