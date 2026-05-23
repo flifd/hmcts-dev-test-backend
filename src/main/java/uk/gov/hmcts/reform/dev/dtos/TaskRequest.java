@@ -31,5 +31,5 @@ public class TaskRequest {
     @NotNull(message = "Due date and time is required")
     @FutureOrPresent(message = "Due date and time must be in the present or future")
     @Schema(description = "The due date and time for the task", example = "2026-06-22T14:30:00")
-    private LocalDateTime dueDateTime;
+    private LocalDateTime dueTimeStamp;
 }

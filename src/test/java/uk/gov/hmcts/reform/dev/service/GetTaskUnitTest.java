@@ -1,30 +1,33 @@
 package uk.gov.hmcts.reform.dev.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.dev.dtos.TaskRequest;
 import uk.gov.hmcts.reform.dev.dtos.TaskResponse;
 import uk.gov.hmcts.reform.dev.models.Task;
 import uk.gov.hmcts.reform.dev.repository.TaskRepository;
 import uk.gov.hmcts.reform.dev.utils.Constants;
+import uk.gov.hmcts.reform.dev.utils.Utils;
 
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GetTaskUnitTest {
     @Mock
     TaskRepository taskRepository;
+
+    @Mock
+    Utils utils;
 
     @InjectMocks
     TaskServiceImpl taskService;
@@ -51,6 +54,7 @@ public class GetTaskUnitTest {
 
     @Test
     void testGetTask() {
+        when(utils.validateTaskId(0)).thenReturn(true);
         when(taskRepository.findById(0)).thenReturn(java.util.Optional.of(task));
 
         TaskResponse response = taskService.getTaskById(0);
@@ -58,7 +62,32 @@ public class GetTaskUnitTest {
     }
 
     @Test
+    void testGetAllTasksEmpty() {
+        List<Task> emptyTaskList = new ArrayList<>();
+        when(taskRepository.findAll()).thenReturn(emptyTaskList);
+
+        List<TaskResponse> response = taskService.getAllTasks();
+        assertThat(response).isEqualTo(List.of());
+    }
+
+    @Test
+    void testGetAllTasks() {
+        Task task2 = task;
+        task2.setId(1);
+
+        List<Task> taskList = List.of(
+            task,
+            task2
+        );
+        when(taskRepository.findAll()).thenReturn(taskList);
+
+        List<TaskResponse> response = taskService.getAllTasks();
+        assertThat(response.size()).isEqualTo(taskList.size());
+    }
+
+    @Test
     void testGetNonExistentTask() {
+        when(utils.validateTaskId(9999)).thenReturn(true);
         when(taskRepository.findById(9999)).thenReturn(java.util.Optional.empty());
         TaskResponse response = taskService.getTaskById(9999);
         assertThat(response).isNull();
@@ -66,6 +95,7 @@ public class GetTaskUnitTest {
 
     @Test
     void testGetInvalidTask() {
+        when(utils.validateTaskId(-1)).thenReturn(false);
         assertThrows(
             InvalidParameterException.class, () -> {
                 taskService.getTaskById(-1);

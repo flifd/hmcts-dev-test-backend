@@ -28,11 +28,11 @@ public class TaskResponse {
     private Status status;
 
     @Schema(description = "The due date and time for the task", example = "2026-06-22T14:30:00")
-    private LocalDateTime dueDateTime;
+    private LocalDateTime dueTimestamp;
 
     @Schema(description = "The timestamp when the task was created", example = "2026-05-22T10:00:00")
-    private LocalDateTime createdDateTime;
+    private LocalDateTime createdTimestamp;
 
     @Schema(description = "The timestamp when the task was last updated", example = "2026-05-22T10:00:00")
-    private LocalDateTime updatedDateTime;
+    private LocalDateTime updatedTimestamp;
 }
