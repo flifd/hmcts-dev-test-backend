@@ -12,8 +12,12 @@ import uk.gov.hmcts.reform.dev.utils.Constants;
 import uk.gov.hmcts.reform.dev.utils.Utils;
 
 import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -23,15 +27,20 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private Utils utils;
 
-    @Autowired
-    private TaskMapper taskMapper;
-
     @Override
-    public List<TaskResponse> getAllTasks() {
-        List<TaskResponse> taskDtos = new ArrayList<>();
+    public Map<Constants.Status, List<TaskResponse>> getAllTasks() {
+        Map<Constants.Status, List<TaskResponse>> taskDtos = new HashMap<>();
 
         Iterable<Task> dbResponse = taskRepository.findAll();
-        dbResponse.forEach(task -> taskDtos.add(taskMapper.toDto(task)));
+
+        dbResponse.forEach(task -> {
+            TaskResponse taskDto = TaskMapper.INSTANCE.toDto(task);
+            List<TaskResponse> taskList = taskDtos.getOrDefault(taskDto.getStatus(), new ArrayList<>());
+            taskList.add(taskDto);
+            taskDtos.put(taskDto.getStatus(), taskList);
+
+
+        });
 
         return taskDtos;
     }
@@ -48,16 +57,19 @@ public class TaskServiceImpl implements TaskService {
             return null;
         }
 
-        return taskMapper.toDto(dbResponse);
+        return TaskMapper.INSTANCE.toDto(dbResponse);
     }
 
     @Override
     public TaskResponse createTask(TaskRequest taskDto) {
-        Task task = taskMapper.fromDto(taskDto);
+        taskDto.setStatus(Constants.Status.PENDING.name());
+        taskDto.setCreatedTimestamp(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        taskDto.setUpdatedTimestamp(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        Task task = TaskMapper.INSTANCE.fromDto(taskDto);
 
         Task dbResponse = taskRepository.save(task);
 
-        return taskMapper.toDto(dbResponse);
+        return TaskMapper.INSTANCE.toDto(dbResponse);
     }
 
     @Override
@@ -65,7 +77,7 @@ public class TaskServiceImpl implements TaskService {
         Task dbResponse = taskRepository.updateTask(taskId, Constants.Status.valueOf(status))
             .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
 
-        return taskMapper.toDto(dbResponse);
+        return TaskMapper.INSTANCE.toDto(dbResponse);
     }
 
     @Override
