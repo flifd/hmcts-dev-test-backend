@@ -14,7 +14,7 @@ public interface TaskService {
 
     TaskResponse createTask(TaskRequest task);
 
-    TaskResponse updateTask(int taskId, String status);
+    Integer updateTask(int taskId, String status);
 
     void deleteTask (int taskId);
 }

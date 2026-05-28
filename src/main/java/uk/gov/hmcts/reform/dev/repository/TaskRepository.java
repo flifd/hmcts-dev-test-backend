@@ -13,5 +13,5 @@ public interface TaskRepository extends CrudRepository<Task, Integer, Constants.
     @Modifying
     @Transactional
     @Query("UPDATE Task t SET t.status = :status WHERE t.id = :id")
-    Optional<Task> updateTask(Integer id, Constants.Status status);
+    Integer updateTask(Integer id, Constants.Status status);
 }

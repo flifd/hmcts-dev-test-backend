@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 public class JacksonConfig {
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm:ss");
         return builder -> builder
             .deserializerByType(LocalDateTime.class, new LocalDateTimeDeserializer(formatter))
             .serializerByType(LocalDateTime.class, new LocalDateTimeSerializer(formatter));

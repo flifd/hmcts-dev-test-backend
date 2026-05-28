@@ -61,7 +61,7 @@ public class CreateTaskUnitTest {
             .title("Review blocked case")
             .description("Investigate the cause")
             .status("PENDING")
-            .dueTimeStamp(LocalDateTime.parse("2026-05-25T00:00:00"))
+            .dueTimestamp(LocalDateTime.parse("2026-05-25T00:00:00"))
             .build();
 
         TaskResponse expectedTaskRes = TaskResponse.builder()
@@ -74,9 +74,7 @@ public class CreateTaskUnitTest {
             .updatedTimestamp(LocalDateTime.parse("2026-05-22T00:00:00"))
             .build();
 
-        when(taskRepository.save(task)).thenReturn(task);
-        when(taskMapper.fromDto(taskReq)).thenReturn(task);
-        when(taskMapper.toDto(task)).thenReturn(expectedTaskRes);
+        when(taskRepository.save(any(Task.class))).thenReturn(task);
 
         TaskResponse taskRes = taskService.createTask(taskReq);
         assertThat(taskRes).isEqualTo(expectedTaskRes);
@@ -107,12 +105,10 @@ public class CreateTaskUnitTest {
         TaskRequest taskReq = TaskRequest.builder()
             .title("Review blocked case")
             .status("PENDING")
-            .dueTimeStamp(LocalDateTime.now().plusDays(1))
+            .dueTimestamp(LocalDateTime.now().plusDays(1))
             .build();
 
-        when(taskRepository.save(task)).thenReturn(task);
-        when(taskMapper.fromDto(taskReq)).thenReturn(task);
-        when(taskMapper.toDto(task)).thenReturn(expectedTaskRes);
+        when(taskRepository.save(any(Task.class))).thenReturn(task);
 
         TaskResponse taskRes = taskService.createTask(taskReq);
         assertThat(taskRes).isEqualTo(expectedTaskRes);
@@ -126,7 +122,7 @@ public class CreateTaskUnitTest {
             .title("")
             .description("Investigate the cause")
             .status("PENDING")
-            .dueTimeStamp(LocalDateTime.now().plusDays(1))
+            .dueTimestamp(LocalDateTime.now().plusDays(1))
             .build();
 
         Set<ConstraintViolation<TaskRequest>> violations = validator.validate(request);
@@ -142,7 +138,7 @@ public class CreateTaskUnitTest {
             .title(null)
             .description("Investigate the cause")
             .status("PENDING")
-            .dueTimeStamp(LocalDateTime.now().plusDays(1))
+            .dueTimestamp(LocalDateTime.now().plusDays(1))
             .build();
 
         Set<ConstraintViolation<TaskRequest>> violations = validator.validate(request);
@@ -155,7 +151,7 @@ public class CreateTaskUnitTest {
             .title("Review blocked case")
             .description("Investigate the cause")
             .status(null)
-            .dueTimeStamp(LocalDateTime.now().plusDays(1))
+            .dueTimestamp(LocalDateTime.now().plusDays(1))
             .build();
 
         Set<ConstraintViolation<TaskRequest>> violations = validator.validate(request);
@@ -171,7 +167,7 @@ public class CreateTaskUnitTest {
             .title("Review blocked case")
             .description("Investigate the cause")
             .status("PENDING")
-            .dueTimeStamp(null)
+            .dueTimestamp(null)
             .build();
 
         Set<ConstraintViolation<TaskRequest>> violations = validator.validate(request);
@@ -187,7 +183,7 @@ public class CreateTaskUnitTest {
             .title("Review blocked case")
             .description("Investigate the cause")
             .status("PENDING")
-            .dueTimeStamp(LocalDateTime.now().minusDays(1))
+            .dueTimestamp(LocalDateTime.now().minusDays(1))
             .build();
 
         Set<ConstraintViolation<TaskRequest>> violations = validator.validate(request);
@@ -203,7 +199,7 @@ public class CreateTaskUnitTest {
             .title("")
             .description("Some description")
             .status(null)
-            .dueTimeStamp(LocalDateTime.now().minusHours(1))
+            .dueTimestamp(LocalDateTime.now().minusHours(1))
             .build();
 
         Set<ConstraintViolation<TaskRequest>> violations = validator.validate(request);

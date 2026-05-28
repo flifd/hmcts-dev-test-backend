@@ -15,5 +15,5 @@ public interface CrudRepository<T, ID, S> extends Repository<T, ID> {
 
     void deleteById(ID id);
 
-    Optional<T> updateTask(ID id, S status);
+    Integer updateTask(ID id, S status);
 }

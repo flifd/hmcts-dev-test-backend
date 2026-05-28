@@ -14,9 +14,7 @@ import uk.gov.hmcts.reform.dev.utils.Utils;
 
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -59,7 +57,6 @@ public class GetTaskUnitTest {
     @Test
     void testGetTask() {
         when(utils.validateTaskId(0)).thenReturn(true);
-        when(taskMapper.toDto(task)).thenReturn(expectedTaskRes);
         when(taskRepository.findById(0)).thenReturn(java.util.Optional.of(task));
 
         TaskResponse response = taskService.getTaskById(0);
@@ -71,8 +68,8 @@ public class GetTaskUnitTest {
         List<Task> emptyTaskList = new ArrayList<>();
         when(taskRepository.findAll()).thenReturn(emptyTaskList);
 
-        List<TaskResponse> response = taskService.getAllTasks();
-        assertThat(response).isEqualTo(List.of());
+        Map<Constants.Status, List<TaskResponse>> response = taskService.getAllTasks();
+        assertThat(response).isEqualTo(new HashMap<>());
     }
 
     @Test
@@ -82,16 +79,18 @@ public class GetTaskUnitTest {
         TaskResponse expectedTaskRes2 = expectedTaskRes;
         expectedTaskRes2.setId(1);
 
+        Map<Constants.Status, List<TaskResponse>> expectedResponse = Map.of(
+            Constants.Status.PENDING, List.of(expectedTaskRes, expectedTaskRes2)
+        );
+
         List<Task> taskList = List.of(
             task,
             task2
         );
         when(taskRepository.findAll()).thenReturn(taskList);
-        when(taskMapper.toDto(task)).thenReturn(expectedTaskRes);
-        when(taskMapper.toDto(task2)).thenReturn(expectedTaskRes2);
 
-        List<TaskResponse> response = taskService.getAllTasks();
-        assertThat(response.size()).isEqualTo(taskList.size());
+        Map<Constants.Status, List<TaskResponse>> response = taskService.getAllTasks();
+        assertThat(response).isEqualTo(expectedResponse);
     }
 
     @Test

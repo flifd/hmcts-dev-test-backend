@@ -64,12 +64,11 @@ public class UpdateTaskUnitTest {
 
     @Test
     void testUpdateSuccess() {
-        when(taskRepository.updateTask(0, Constants.Status.IN_PROGRESS)).thenReturn(Optional.ofNullable(updatedTask));
-        when(taskMapper.toDto(updatedTask)).thenReturn(updatedTaskDto);
+        when(taskRepository.updateTask(0, Constants.Status.IN_PROGRESS)).thenReturn(0);
 
-        TaskResponse response = taskService.updateTask(0, "IN_PROGRESS");
+        Integer response = taskService.updateTask(0, "IN_PROGRESS");
 
-        assertThat(response.getStatus()).isEqualTo(Constants.Status.IN_PROGRESS);
+        assertThat(response).isEqualTo(0);
     }
 
     @Test

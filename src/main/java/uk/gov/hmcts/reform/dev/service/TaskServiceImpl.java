@@ -73,11 +73,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponse updateTask(int taskId, String status) {
-        Task dbResponse = taskRepository.updateTask(taskId, Constants.Status.valueOf(status))
-            .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
-
-        return TaskMapper.INSTANCE.toDto(dbResponse);
+    public Integer updateTask(int taskId, String status) {
+        taskRepository.updateTask(taskId, Constants.Status.valueOf(status));
+        return taskId;
     }
 
     @Override

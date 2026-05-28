@@ -35,7 +35,7 @@ public class TaskController {
         return this.taskRepository.findAll();
     }
 
-    @RequestMapping(value = "/tasks/{taskId}", method = RequestMethod.GET)
+    @GetMapping(value = "/tasks/{taskId}")
     public Optional<Task> getTaskById(@PathVariable int taskId) {
         return this.taskRepository.findById(taskId);
     }
@@ -45,13 +45,12 @@ public class TaskController {
         return ok(service.createTask(taskRequest));
     }
 
-    @PutMapping(value = "/tasks/{id}/status")
-    public ResponseEntity<String> updateTaskStatus(@PathVariable int taskId, @RequestBody UpdateStatusRequest request) {
-        service.updateTask(taskId, request.getStatus());
-        return ok("Task status updated successfully");
+    @PutMapping(value = "/tasks/{taskId}/status")
+    public ResponseEntity<Integer> updateTaskStatus(@PathVariable int taskId, @RequestBody UpdateStatusRequest request) {
+        return ok(service.updateTask(taskId, request.getStatus()));
     }
 
-    @DeleteMapping(value = "/tasks/{id}")
+    @DeleteMapping(value = "/tasks/{taskId}")
     public ResponseEntity<String> deleteTask(@PathVariable int taskId) {
         service.deleteTask(taskId);
         return ok("Task deleted successfully");
